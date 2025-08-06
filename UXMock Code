@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guided Path UI Wizard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for better visual appeal */
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f4f8; /* Light background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #wizard-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 600px;
+            width: 100%;
+            padding: 2.5rem; /* Increased padding */
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Space between sections */
+        }
+
+        #steps-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem; /* Space between dots */
+            margin-bottom: 1.5rem;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #cbd5e1; /* Gray dot */
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .step-dot.active {
+            background-color: #4f46e5; /* Indigo active dot */
+        }
+
+        #wizard-content {
+            min-height: 150px; /* Ensure content area has a minimum height */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wizard-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem; /* Rounded buttons */
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .wizard-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .wizard-button:active {
+            transform: translateY(0);
+        }
+
+        #prev-button {
+            background-color: #e2e8f0; /* Light gray */
+            color: #475569; /* Slate gray text */
+        }
+
+        #prev-button:hover {
+            background-color: #cbd5e1;
+        }
+
+        #next-button, #finish-button {
+            background-color: #6366f1; /* Indigo */
+            color: #ffffff;
+        }
+
+        #next-button:hover, #finish-button:hover {
+            background-color: #4f46e5;
+        }
+
+        #button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem; /* Space between buttons */
+            margin-top: 1.5rem;
+        }
+
+        #button-container.single-button {
+            justify-content: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            #wizard-container {
+                padding: 1.5rem;
+            }
+            #button-container {
+                flex-direction: column;
+            }
+            .wizard-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wizard-container">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Setup Wizard</h2>
+
+        <div id="steps-indicator">
+            <!-- Dots will be dynamically added here by JavaScript -->
+        </div>
+
+        <div id="wizard-content" class="text-gray-700 text-lg">
+            <!-- Step content will be dynamically loaded here -->
+        </div>
+
+        <div id="button-container">
+            <button id="prev-button" class="wizard-button" style="display: none;">Previous</button>
+            <button id="next-button" class="wizard-button">Next</button>
+            <button id="finish-button" class="wizard-button" style="display: none;">Finish</button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const wizardContent = document.getElementById('wizard-content');
+        const stepsIndicator = document.getElementById('steps-indicator');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const finishButton = document.getElementById('finish-button');
+        const buttonContainer = document.getElementById('button-container');
+
+        // Define the steps of the wizard
+        const steps = [
+            {
+                title: 'Welcome to Our Setup!',
+                description: 'This wizard will guide you through the initial setup process. Click "Next" to begin.'
+            },
+            {
+                title: 'Step 1: Account Information',
+                description: 'Please provide your basic account details here. All fields are required.'
+            },
+            {
+                title: 'Step 2: Profile Customization',
+                description: 'Personalize your profile settings, including your display name and avatar.'
+            },
+            {
+                title: 'Step 3: Notification Preferences',
+                description: 'Choose how you would like to receive notifications from us.'
+            },
+            {
+                title: 'Step 4: Review and Confirm',
+                description: 'Review all your settings before finalizing. You can go back to make changes.'
+            },
+            {
+                title: 'Setup Complete!',
+                description: 'Congratulations! Your setup is now complete. You can now start using our services.'
+            }
+        ];
+
+        let currentStep = 0; // Initialize the current step
+
+        /**
+         * Renders the current step's content and updates the UI.
+         */
+        function renderStep() {
+            // Update the main content area
+            wizardContent.innerHTML = `
+                <h3 class="text-2xl font-semibold mb-2 text-gray-800">${steps[currentStep].title}</h3>
+                <p class="text-base text-gray-600">${steps[currentStep].description}</p>
+            `;
+
+            // Update the steps indicator dots
+            stepsIndicator.innerHTML = ''; // Clear existing dots
+            steps.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('step-dot');
+                if (index === currentStep) {
+                    dot.classList.add('active');
+                }
+                stepsIndicator.appendChild(dot);
+            });
+
+            // Handle button visibility based on the current step
+            if (currentStep === 0) {
+                prevButton.style.display = 'none'; // Hide "Previous" on the first step
+                nextButton.style.display = 'block'; // Show "Next"
+                finishButton.style.display = 'none'; // Hide "Finish"
+                buttonContainer.classList.remove('single-button');
+            } else if (currentStep === steps.length - 1) {
+                prevButton.style.display = 'none'; // Hide "Previous" on the last step
+                nextButton.style.display = 'none'; // Hide "Next"
+                finishButton.style.display = 'block'; // Show "Finish"
+                buttonContainer.classList.add('single-button'); // Center the finish button
+            } else {
+                prevButton.style.display = 'block'; // Show "Previous"
+                nextButton.style.display = 'block'; // Show "Next"
+                finishButton.style.display = 'none'; // Hide "Finish"
+                buttonContainer.classList.remove('single-button');
+            }
+        }
+
+        /**
+         * Handles the "Next" button click.
+         */
+        function handleNext() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                renderStep();
+            }
+        }
+
+        /**
+         * Handles the "Previous" button click.
+         */
+        function handlePrev() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep();
+            }
+        }
+
+        /**
+         * Handles the "Finish" button click.
+         * In a real application, this would submit data or redirect the user.
+         */
+        function handleFinish() {
+            alert('Wizard Finished! Data would be submitted here.');
+            // You might redirect the user or show a final success message
+            // window.location.href = '/dashboard';
+        }
+
+        // Add event listeners to the buttons
+        nextButton.addEventListener('click', handleNext);
+        prevButton.addEventListener('click', handlePrev);
+        finishButton.addEventListener('click', handleFinish);
+
+        // Initial render when the page loads
+        document.addEventListener('DOMContentLoaded', renderStep);
+    </script>
+
+</body>
+</html>
