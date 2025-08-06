@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guided Path UI Wizard</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for better visual appeal */
+        /* Custom styles for the wizard */
         body {
-            font-family: "Inter", sans-serif;
-            background-color: #f0f4f8; /* Light background */
+            font-family: 'Inter', sans-serif; /* Using a common sans-serif font */
+            background-color: #f0f4f8; /* Light background color */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,21 +20,30 @@
 
         #wizard-container {
             background-color: #ffffff;
-            border-radius: 1.5rem; /* More rounded corners */
+            border-radius: 24px; /* Rounded corners */
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             max-width: 600px;
             width: 100%;
-            padding: 2.5rem; /* Increased padding */
+            padding: 40px; /* Increased padding */
             display: flex;
             flex-direction: column;
-            gap: 1.5rem; /* Space between sections */
+            gap: 24px; /* Space between sections */
+            position: relative; /* For modal positioning */
+        }
+
+        h2 {
+            font-size: 2.25rem; /* Equivalent to text-3xl */
+            font-weight: 700; /* Equivalent to font-bold */
+            text-align: center;
+            color: #1f2937; /* Equivalent to text-gray-800 */
+            margin-bottom: 16px; /* Equivalent to mb-4 */
         }
 
         #steps-indicator {
             display: flex;
             justify-content: center;
-            gap: 0.75rem; /* Space between dots */
-            margin-bottom: 1.5rem;
+            gap: 12px; /* Space between dots */
+            margin-bottom: 24px;
         }
 
         .step-dot {
@@ -58,14 +65,29 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            color: #4b5563; /* Equivalent to text-gray-700 */
+            font-size: 1.125rem; /* Equivalent to text-lg */
+        }
+
+        #wizard-content h3 {
+            font-size: 1.5rem; /* Equivalent to text-2xl */
+            font-weight: 600; /* Equivalent to font-semibold */
+            margin-bottom: 8px; /* Equivalent to mb-2 */
+            color: #1f2937; /* Equivalent to text-gray-800 */
+        }
+
+        #wizard-content p {
+            font-size: 1rem; /* Equivalent to text-base */
+            color: #4b5563; /* Equivalent to text-gray-600 */
         }
 
         .wizard-button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem; /* Rounded buttons */
+            padding: 12px 24px;
+            border-radius: 12px; /* Rounded buttons */
             font-weight: 600;
             transition: background-color 0.3s ease, transform 0.2s ease;
             cursor: pointer;
+            border: none;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
@@ -98,18 +120,73 @@
         #button-container {
             display: flex;
             justify-content: space-between;
-            gap: 1rem; /* Space between buttons */
-            margin-top: 1.5rem;
+            gap: 16px; /* Space between buttons */
+            margin-top: 24px;
         }
 
         #button-container.single-button {
             justify-content: center;
         }
 
+        /* Modal specific styles */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 24px; /* Match wizard container border-radius */
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-content h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .modal-content p {
+            font-size: 1rem;
+            color: #4b5563;
+        }
+
+        .modal-button {
+            background-color: #6366f1;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-button:hover {
+            background-color: #4f46e5;
+        }
+
+
         /* Responsive adjustments */
         @media (max-width: 480px) {
             #wizard-container {
-                padding: 1.5rem;
+                padding: 24px;
             }
             #button-container {
                 flex-direction: column;
@@ -123,13 +200,13 @@
 <body>
 
     <div id="wizard-container">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Setup Wizard</h2>
+        <h2>Setup Wizard</h2>
 
         <div id="steps-indicator">
             <!-- Dots will be dynamically added here by JavaScript -->
         </div>
 
-        <div id="wizard-content" class="text-gray-700 text-lg">
+        <div id="wizard-content">
             <!-- Step content will be dynamically loaded here -->
         </div>
 
@@ -148,6 +225,7 @@
         const nextButton = document.getElementById('next-button');
         const finishButton = document.getElementById('finish-button');
         const buttonContainer = document.getElementById('button-container');
+        const wizardContainer = document.getElementById('wizard-container'); // Used for modal
 
         // Define the steps of the wizard
         const steps = [
@@ -185,8 +263,8 @@
         function renderStep() {
             // Update the main content area
             wizardContent.innerHTML = `
-                <h3 class="text-2xl font-semibold mb-2 text-gray-800">${steps[currentStep].title}</h3>
-                <p class="text-base text-gray-600">${steps[currentStep].description}</p>
+                <h3>${steps[currentStep].title}</h3>
+                <p>${steps[currentStep].description}</p>
             `;
 
             // Update the steps indicator dots
@@ -220,6 +298,39 @@
         }
 
         /**
+         * Shows a custom modal message instead of alert().
+         * @param {string} title - The title of the modal.
+         * @param {string} message - The message content of the modal.
+         */
+        function showModal(title, message) {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.classList.add('modal-overlay');
+
+            const modalContent = document.createElement('div');
+            modalContent.classList.add('modal-content');
+
+            const modalTitle = document.createElement('h4');
+            modalTitle.textContent = title;
+
+            const modalMessage = document.createElement('p');
+            modalMessage.textContent = message;
+
+            const modalButton = document.createElement('button');
+            modalButton.classList.add('modal-button');
+            modalButton.textContent = 'OK';
+            modalButton.addEventListener('click', () => {
+                modalOverlay.remove();
+            });
+
+            modalContent.appendChild(modalTitle);
+            modalContent.appendChild(modalMessage);
+            modalContent.appendChild(modalButton);
+            modalOverlay.appendChild(modalContent);
+
+            wizardContainer.appendChild(modalOverlay);
+        }
+
+        /**
          * Handles the "Next" button click.
          */
         function handleNext() {
@@ -244,7 +355,7 @@
          * In a real application, this would submit data or redirect the user.
          */
         function handleFinish() {
-            alert('Wizard Finished! Data would be submitted here.');
+            showModal('Wizard Finished!', 'Your setup is complete. Data would be submitted here in a real application.');
             // You might redirect the user or show a final success message
             // window.location.href = '/dashboard';
         }
