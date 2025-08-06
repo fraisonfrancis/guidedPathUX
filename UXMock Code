@@ -3,12 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guided Path UI Wizard</title>
+    <title>Salesforce-Themed Guided Wizard</title>
     <style>
+        /* Salesforce-inspired color palette */
+        :root {
+            --sf-blue: #0070d2; /* Primary Salesforce Blue */
+            --sf-blue-dark: #005fb2; /* Darker blue for hover */
+            --sf-gray-light: #f3f3f3; /* Light background gray */
+            --sf-gray-medium: #e0e0e0; /* Medium gray for borders/inactive elements */
+            --sf-gray-dark: #706e6b; /* Darker gray for text */
+            --sf-text-dark: #1a1a1a; /* Very dark text */
+            --sf-white: #ffffff;
+        }
+
         /* Custom styles for the wizard */
         body {
-            font-family: 'Inter', sans-serif; /* Using a common sans-serif font */
-            background-color: #f0f4f8; /* Light background color */
+            font-family: 'Salesforce Sans', Arial, sans-serif; /* Mimicking Salesforce font */
+            background-color: var(--sf-gray-light);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -19,174 +30,262 @@
         }
 
         #wizard-container {
-            background-color: #ffffff;
-            border-radius: 24px; /* Rounded corners */
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            max-width: 600px;
+            background-color: var(--sf-white);
+            border-radius: 6px; /* Slightly less rounded than previous, common in SF */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            max-width: 800px; /* Increased max-width for vertical layout */
             width: 100%;
-            padding: 40px; /* Increased padding */
+            padding: 32px; /* Adjusted padding */
             display: flex;
             flex-direction: column;
-            gap: 24px; /* Space between sections */
+            gap: 20px; /* Space between sections */
             position: relative; /* For modal positioning */
+            border: 1px solid var(--sf-gray-medium); /* Light border */
         }
 
         h2 {
-            font-size: 2.25rem; /* Equivalent to text-3xl */
-            font-weight: 700; /* Equivalent to font-bold */
+            font-size: 2rem; /* Adjusted font size */
+            font-weight: 600; /* Semi-bold */
             text-align: center;
-            color: #1f2937; /* Equivalent to text-gray-800 */
-            margin-bottom: 16px; /* Equivalent to mb-4 */
+            color: var(--sf-text-dark);
+            margin-bottom: 16px;
+        }
+
+        /* Main layout for vertical wizard */
+        #wizard-main-content {
+            display: flex;
+            gap: 30px; /* Space between vertical steps and content */
+            flex-wrap: wrap; /* Allow wrapping on small screens */
         }
 
         #steps-indicator {
             display: flex;
-            justify-content: center;
-            gap: 12px; /* Space between dots */
-            margin-bottom: 24px;
+            flex-direction: column; /* Vertical layout */
+            align-items: flex-start; /* Align dots/names to the start */
+            margin-bottom: 0; /* No bottom margin for vertical */
+            padding-left: 15px; /* Space for the vertical line */
+            position: relative; /* For the vertical line */
+        }
+
+        #steps-indicator::before {
+            content: '';
+            position: absolute;
+            left: 20px; /* Position of the vertical line */
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--sf-gray-medium); /* Color of the vertical line */
+            z-index: 0; /* Behind the dots */
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center; /* Align dot and text vertically */
+            margin-bottom: 20px; /* Space between step items */
+            position: relative;
+            z-index: 1; /* Above the vertical line */
         }
 
         .step-dot {
             width: 12px;
             height: 12px;
-            background-color: #cbd5e1; /* Gray dot */
-            border-radius: 50%;
-            transition: background-color 0.3s ease;
+            background-color: var(--sf-gray-medium); /* Inactive dot background */
+            border-radius: 50%; /* Make it a circle */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--sf-white); /* Text color for active dot number */
+            font-weight: 600;
+            font-size: 0.7rem;
+            flex-shrink: 0; /* Prevent dot from shrinking */
+            margin-right: 15px; /* Space between dot and text */
+            border: 2px solid var(--sf-gray-medium); /* Border for inactive dot */
         }
 
         .step-dot.active {
-            background-color: #4f46e5; /* Indigo active dot */
+            background-color: var(--sf-blue); /* Active dot background */
+            border-color: var(--sf-blue); /* Active dot border */
+            color: var(--sf-white);
+        }
+
+        .step-name {
+            font-size: 0.95rem;
+            color: var(--sf-gray-dark);
+            font-weight: 500;
+            white-space: nowrap; /* Prevent text wrapping */
+            transition: color 0.3s ease;
+        }
+
+        .step-dot.active + .step-name {
+            color: var(--sf-blue); /* Active step name color */
+            font-weight: 600;
         }
 
         #wizard-content {
-            min-height: 150px; /* Ensure content area has a minimum height */
+            flex-grow: 1; /* Allow content to take remaining space */
+            min-height: 150px;
             text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #4b5563; /* Equivalent to text-gray-700 */
-            font-size: 1.125rem; /* Equivalent to text-lg */
+            color: var(--sf-text-dark);
+            font-size: 1.1rem;
+            background-color: var(--sf-white); /* Ensure content background is white */
+            padding: 20px; /* Add some padding to content */
+            border-radius: 6px; /* Match container rounding */
+            border: 1px solid var(--sf-gray-medium); /* Content border */
         }
 
         #wizard-content h3 {
-            font-size: 1.5rem; /* Equivalent to text-2xl */
-            font-weight: 600; /* Equivalent to font-semibold */
-            margin-bottom: 8px; /* Equivalent to mb-2 */
-            color: #1f2937; /* Equivalent to text-gray-800 */
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--sf-text-dark);
         }
 
         #wizard-content p {
-            font-size: 1rem; /* Equivalent to text-base */
-            color: #4b5563; /* Equivalent to text-gray-600 */
+            font-size: 0.95rem;
+            color: var(--sf-gray-dark);
         }
 
         .wizard-button {
-            padding: 12px 24px;
-            border-radius: 12px; /* Rounded buttons */
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
             cursor: pointer;
-            border: none;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid transparent;
+            box-shadow: none;
         }
 
         .wizard-button:hover {
-            transform: translateY(-2px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .wizard-button:active {
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
             transform: translateY(0);
         }
 
         #prev-button {
-            background-color: #e2e8f0; /* Light gray */
-            color: #475569; /* Slate gray text */
+            background-color: var(--sf-white);
+            color: var(--sf-blue);
+            border-color: var(--sf-blue);
         }
 
         #prev-button:hover {
-            background-color: #cbd5e1;
+            background-color: var(--sf-gray-light);
         }
 
         #next-button, #finish-button {
-            background-color: #6366f1; /* Indigo */
-            color: #ffffff;
+            background-color: var(--sf-blue);
+            color: var(--sf-white);
+            border-color: var(--sf-blue);
         }
 
         #next-button:hover, #finish-button:hover {
-            background-color: #4f46e5;
+            background-color: var(--sf-blue-dark);
         }
 
         #button-container {
             display: flex;
             justify-content: space-between;
-            gap: 16px; /* Space between buttons */
+            gap: 16px;
             margin-top: 24px;
         }
 
         #button-container.single-button {
-            justify-content: center;
+            justify-content: flex-end;
         }
 
-        /* Modal specific styles */
+        /* Modal specific styles (Salesforce inspired) */
         .modal-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            border-radius: 24px; /* Match wizard container border-radius */
+            border-radius: 6px;
         }
 
         .modal-content {
-            background-color: #ffffff;
+            background-color: var(--sf-white);
             padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
-            max-width: 400px;
+            max-width: 450px;
             width: 90%;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            border: 1px solid var(--sf-gray-medium);
         }
 
         .modal-content h4 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 600;
-            color: #1f2937;
+            color: var(--sf-text-dark);
         }
 
         .modal-content p {
-            font-size: 1rem;
-            color: #4b5563;
+            font-size: 0.95rem;
+            color: var(--sf-gray-dark);
         }
 
         .modal-button {
-            background-color: #6366f1;
-            color: #ffffff;
+            background-color: var(--sf-blue);
+            color: var(--sf-white);
             padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
+            border-radius: 4px;
+            border: 1px solid var(--sf-blue);
             cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
+            font-weight: 500;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .modal-button:hover {
-            background-color: #4f46e5;
+            background-color: var(--sf-blue-dark);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
+        .modal-button:active {
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
 
         /* Responsive adjustments */
-        @media (max-width: 480px) {
-            #wizard-container {
-                padding: 24px;
+        @media (max-width: 768px) { /* Adjusted breakpoint for vertical layout */
+            #wizard-main-content {
+                flex-direction: column; /* Stack steps and content vertically */
+            }
+            #steps-indicator {
+                width: 100%; /* Full width for indicator */
+                padding-left: 0; /* Remove left padding */
+                align-items: center; /* Center items for better appearance */
+                margin-bottom: 20px;
+            }
+            #steps-indicator::before {
+                left: 50%; /* Center the line */
+                transform: translateX(-50%); /* Adjust for line width */
+            }
+            .step-item {
+                flex-direction: column; /* Stack dot and name */
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .step-dot {
+                margin-right: 0; /* Remove margin for stacked layout */
+                margin-bottom: 5px; /* Space between dot and name */
+            }
+            #wizard-content {
+                width: 100%; /* Full width for content */
             }
             #button-container {
                 flex-direction: column;
@@ -200,14 +299,16 @@
 <body>
 
     <div id="wizard-container">
-        <h2>Setup Wizard</h2>
+        <h2>New Record Wizard</h2>
 
-        <div id="steps-indicator">
-            <!-- Dots will be dynamically added here by JavaScript -->
-        </div>
+        <div id="wizard-main-content">
+            <div id="steps-indicator">
+                <!-- Step names will be dynamically added here by JavaScript -->
+            </div>
 
-        <div id="wizard-content">
-            <!-- Step content will be dynamically loaded here -->
+            <div id="wizard-content">
+                <!-- Step content will be dynamically loaded here -->
+            </div>
         </div>
 
         <div id="button-container">
@@ -230,28 +331,28 @@
         // Define the steps of the wizard
         const steps = [
             {
-                title: 'Welcome to Our Setup!',
-                description: 'This wizard will guide you through the initial setup process. Click "Next" to begin.'
+                title: 'Details',
+                description: 'Enter the primary details for your new record. All required fields are marked.'
             },
             {
-                title: 'Step 1: Account Information',
-                description: 'Please provide your basic account details here. All fields are required.'
+                title: 'Related Info',
+                description: 'Add any associated information or related records here.'
             },
             {
-                title: 'Step 2: Profile Customization',
-                description: 'Personalize your profile settings, including your display name and avatar.'
+                title: 'Attachments',
+                description: 'Upload relevant files or documents for this record.'
             },
             {
-                title: 'Step 3: Notification Preferences',
-                description: 'Choose how you would like to receive notifications from us.'
+                title: 'Permissions',
+                description: 'Configure sharing settings and user access for this record.'
             },
             {
-                title: 'Step 4: Review and Confirm',
-                description: 'Review all your settings before finalizing. You can go back to make changes.'
+                title: 'Review',
+                description: 'Review all entered information before saving. You can go back to make changes.'
             },
             {
-                title: 'Setup Complete!',
-                description: 'Congratulations! Your setup is now complete. You can now start using our services.'
+                title: 'Save',
+                description: 'Your new record is ready to be created. Click "Finish" to save.'
             }
         ];
 
@@ -267,15 +368,26 @@
                 <p>${steps[currentStep].description}</p>
             `;
 
-            // Update the steps indicator dots
-            stepsIndicator.innerHTML = ''; // Clear existing dots
-            steps.forEach((_, index) => {
+            // Update the steps indicator
+            stepsIndicator.innerHTML = ''; // Clear existing items
+            steps.forEach((step, index) => {
+                const stepItem = document.createElement('div');
+                stepItem.classList.add('step-item');
+
                 const dot = document.createElement('div');
                 dot.classList.add('step-dot');
+                dot.textContent = index + 1; // Show step number in the dot
                 if (index === currentStep) {
                     dot.classList.add('active');
                 }
-                stepsIndicator.appendChild(dot);
+                stepItem.appendChild(dot);
+
+                const stepName = document.createElement('span');
+                stepName.classList.add('step-name');
+                stepName.textContent = step.title; // Show step name next to the dot
+                stepItem.appendChild(stepName);
+
+                stepsIndicator.appendChild(stepItem);
             });
 
             // Handle button visibility based on the current step
@@ -288,7 +400,7 @@
                 prevButton.style.display = 'none'; // Hide "Previous" on the last step
                 nextButton.style.display = 'none'; // Hide "Next"
                 finishButton.style.display = 'block'; // Show "Finish"
-                buttonContainer.classList.add('single-button'); // Center the finish button
+                buttonContainer.classList.add('single-button'); // Align finish button to the right
             } else {
                 prevButton.style.display = 'block'; // Show "Previous"
                 nextButton.style.display = 'block'; // Show "Next"
@@ -355,9 +467,9 @@
          * In a real application, this would submit data or redirect the user.
          */
         function handleFinish() {
-            showModal('Wizard Finished!', 'Your setup is complete. Data would be submitted here in a real application.');
-            // You might redirect the user or show a final success message
-            // window.location.href = '/dashboard';
+            showModal('Record Saved!', 'Your new record has been successfully created. Data would be submitted here.');
+            // In a real Salesforce flow, you might redirect the user to the new record's page
+            // window.location.href = '/new-record-detail-page';
         }
 
         // Add event listeners to the buttons
