@@ -1,0 +1,23 @@
+      <SiebelMessage>
+         <MessageId/>
+         <IntObjectName>ESI MARKETPLACE SR IO</IntObjectName>
+         <MessageType>Integration Object</MessageType>
+         <IntObjectFormat>Siebel Hierarchical</IntObjectFormat>
+         <ListOfESI MARKETPLACE SR IO>
+            <ESI SR(eService)- Light>
+               <Asset Number>1-27595136501</Asset Number>
+               <Asset Id>1-CODFJLH</Asset Id>
+               <Contact Email Address>chandana.kasu556@adp.com</Contact Email Address>
+               <SR Type>Employer</SR Type>
+               <ESI External Id>123456789</ESI External Id>
+               <Abstract>Lorem ipsum</Abstract>
+               <ESI Integration Id>MarketPlace</ESI Integration Id>
+               <ESI Solution>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</ESI Solution>
+               <Sub-Area>Update company details</Sub-Area>
+               <Area>General/Account</Area>
+               <Priority>4-Low</Priority>
+               <Source>MarketPlace</Source>
+               <SR Id>12345</SR Id>
+            </ESI SR(eService)- Light>
+         </ListOfESI MARKETPLACE SR IO>
+      </SiebelMessage>
