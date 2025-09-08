@@ -1,0 +1,3 @@
+​Service request uploads failed because the "Account Country" field was missing. The support team manually fixed the issue, allowing uploads to proceed.
+​The root cause was traced to a mapping conflict: the failed requests were linked to an inactive account, while the associated product ID pointed to an active account.
+​To prevent recurrence, the contact has been de-associated from the inactive account. This should ensure new service requests are created correctly under the active account. The team is continuing to investigate for any other underlying issues.
